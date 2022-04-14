@@ -8,8 +8,6 @@
     "lint": "eslint \"src/**/*.ts\"",
     "format": "prettier --write --ignore-unknown --ignore-path .gitignore '**/*'",
     "build": "rollup -c --config-",
-    "test": "npm run test-unit",
-    "test-unit": "mocha test/unit/**/*.ts",
     "watch": "rollup -cw --config-"
   },
   "repository": {
