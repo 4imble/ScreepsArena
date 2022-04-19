@@ -158,6 +158,8 @@ export function loop(): void {
         attack_status = AttackStatus.Retaliate;
     }
 
+
+    // Attack
     const enemySpawn = getObjectsByPrototype(StructureSpawn).find(i => !i.my);
     if (attack_status == AttackStatus.Retaliate) {
       army.forEach(unit => {
@@ -202,7 +204,8 @@ function doRangedCombat(unit: Creep | undefined, target: Creep | Structure) {
     console.log(massValid ? "MASS ATTACK!" : "Attack");
   }
   else {
-    unit.moveTo(target);
+    if(unit.rangedAttack(target) == ERR_NOT_IN_RANGE)
+      unit.moveTo(target);
   }
 }
 
