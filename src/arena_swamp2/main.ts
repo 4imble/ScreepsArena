@@ -20,6 +20,7 @@ enum CreepType {
 
 let mySpawn: StructureSpawn;
 let enemySpawn: StructureSpawn;
+let allCreeps: Creep[] = [];
 let enemyCreeps: Creep[] = [];
 let myCreeps: Creep[] = [];
 
@@ -29,7 +30,8 @@ let avoidanceMatrix: CostMatrix;
 export function loop(): void {
     mySpawn = <StructureSpawn>getObjectsByPrototype(StructureSpawn).find(i => i.my);
     enemySpawn = <StructureSpawn>getObjectsByPrototype(StructureSpawn).find(i => !i.my);
-    enemyCreeps = getObjectsByPrototype(Creep).filter(i => !i.my);
+    allCreeps = getObjectsByPrototype(Creep);
+    enemyCreeps = allCreeps.filter(i => !i.my);
     myCreeps = myCreeps.filter(x => x?.exists);
 
     //console.log(myCreeps);
@@ -119,16 +121,18 @@ function getAvoidanceMatrix() {
             }
     });
 
+    allCreeps.forEach(creep => {
+        matrix.set(creep.x, creep.y, 255)
+    });
+
     return matrix;
 }
 
-function getMyCreeps(type: CreepType): Creep[]
-{
+function getMyCreeps(type: CreepType): Creep[] {
     return myCreeps.filter(x => x.type == type);
 }
 
-function findMyCreep(type: CreepType): Creep
-{
+function findMyCreep(type: CreepType): Creep {
     return getMyCreeps(type)[0];
 }
 
