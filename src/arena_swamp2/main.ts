@@ -2,7 +2,7 @@ import { spawn } from "child_process";
 import { create } from "domain";
 import { findClosestByPath, findClosestByRange, findInRange, getRange } from "game";
 import { ATTACK, CARRY, ERR_NOT_IN_RANGE, HEAL, MOVE, OK, RANGED_ATTACK, RESOURCE_ENERGY, TERRAIN_WALL, TOUGH } from "game/constants";
-import { CostMatrix, searchPath } from "game/path-finder";
+import { CostMatrix, MoveToOpts, searchPath } from "game/path-finder";
 import { Creep, RoomPosition, Structure, StructureContainer, StructureSpawn } from "game/prototypes";
 import { findPath, getDistance, getObjectsByPrototype, getTerrainAt, getTicks } from "game/utils";
 
@@ -15,7 +15,13 @@ enum AttackStatus {
 enum CreepType {
     None,
     Bait,
-    Army
+    Army,
+    Mule
+}
+
+enum MuleJobs {
+    Collecting,
+    Delivering
 }
 
 let mySpawn: StructureSpawn;
@@ -25,9 +31,10 @@ let enemyCreeps: Creep[] = [];
 let myCreeps: Creep[] = [];
 
 let avoidanceMatrix: CostMatrix;
-
+let defaultMoveOptions: MoveToOpts;
 
 export function loop(): void {
+
     mySpawn = <StructureSpawn>getObjectsByPrototype(StructureSpawn).find(i => i.my);
     enemySpawn = <StructureSpawn>getObjectsByPrototype(StructureSpawn).find(i => !i.my);
     allCreeps = getObjectsByPrototype(Creep);
@@ -37,6 +44,7 @@ export function loop(): void {
     //console.log(myCreeps);
 
     avoidanceMatrix = getAvoidanceMatrix();
+    defaultMoveOptions = { swampCost: 1, plainCost: 2, costMatrix: avoidanceMatrix }
 
     if (mySpawn) {
         spawning();
@@ -45,7 +53,25 @@ export function loop(): void {
 }
 
 function spawning() {
-    createBait() || createArmy();
+    createMule() || createBait() || createArmy();
+}
+
+function createMule() {
+    let mules = getMyCreeps(CreepType.Mule);
+    if (mules.length)
+        return false;
+
+    let mule = <Creep>mySpawn.spawnCreep([MOVE, CARRY, CARRY, MOVE, CARRY, MOVE]).object;
+
+    if (mule) {
+        mule.type = CreepType.Mule;
+        mule.data = {};
+        mule.status = MuleJobs.Collecting;
+        myCreeps.push(mule);
+        console.log("Spawned Mule")
+    }
+
+    return true;
 }
 
 function createBait() {
@@ -67,11 +93,7 @@ function createBait() {
 
 
 function createArmy() {
-    let army = getMyCreeps(CreepType.Army);
-    if (army.length)
-        return false;
-
-    let soldier = <Creep>mySpawn.spawnCreep([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK]).object;
+    let soldier = <Creep>mySpawn.spawnCreep([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK]).object;
 
     if (soldier) {
         soldier.type = CreepType.Army;
@@ -82,10 +104,39 @@ function createArmy() {
     return true;
 }
 
-
 function giveorders() {
+    orderMules();
     orderBaiters();
     orderArmy();
+}
+
+function orderMules() {
+    let mule = findMyCreep(CreepType.Mule);
+
+    if (!mule || !mule.store)
+        return;
+
+    switch (mule.status) {
+        case MuleJobs.Delivering:
+            if (mule.transfer(mySpawn, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                mule.moveTo(mySpawn, defaultMoveOptions);
+            }
+            if (!mule.store.getUsedCapacity()) {
+                mule.status = MuleJobs.Collecting
+            }
+            break;
+        case MuleJobs.Collecting:
+            const container = findClosestByRange(mySpawn, getObjectsByPrototype(StructureContainer).filter(i => i.store.energy > 0));
+            if (mule.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                mule.moveTo(container, defaultMoveOptions);
+            }
+            if (!mule.store.getFreeCapacity()) {
+                mule.status = MuleJobs.Delivering
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 function orderBaiters() {
@@ -93,20 +144,23 @@ function orderBaiters() {
     if (!baiter)
         return;
 
-    let centerCorners = [{ x: 30, y: 35 }, { x: 70, y: 35 }, { x: 70, y: 65 }, { x: 30, y: 65 }]
+    let centerCorners = [enemySpawn, { x: 30, y: 35 }, { x: 70, y: 35 }, { x: 70, y: 65 }, { x: 30, y: 65 }]
     baiter.heal(baiter);
-    if (getRange(baiter, centerCorners[baiter.data.corner]) < 4)
-        baiter.data.corner = baiter.data.corner < 3 ? baiter.data.corner + 1 : 0;
-    baiter.moveTo(centerCorners[baiter.data.corner], { swampCost: 1, plainCost: 2, costMatrix: avoidanceMatrix });
+    let range = baiter.data.corner == 0 ? 12 : 3;
+    if (getRange(baiter, centerCorners[baiter.data.corner]) < range+1)
+        baiter.data.corner = baiter.data.corner < 4 ? baiter.data.corner + 1 : 1;
+    baiter.moveTo(centerCorners[baiter.data.corner], { ...defaultMoveOptions, range: range });
 }
 
 function orderArmy() {
-    let soldier = findMyCreep(CreepType.Army);
-    if (!soldier)
-        return;
+    let army = getMyCreeps(CreepType.Army);
+    army.forEach(soldier => {
+        if (!soldier)
+            return;
 
-    if (soldier.attack(enemySpawn) == ERR_NOT_IN_RANGE)
-        soldier.moveTo(enemySpawn, { swampCost: 1, plainCost: 2, costMatrix: avoidanceMatrix });
+        if (soldier.attack(enemySpawn) == ERR_NOT_IN_RANGE)
+            soldier.moveTo(enemySpawn, defaultMoveOptions);
+    })
 }
 
 function getAvoidanceMatrix() {
