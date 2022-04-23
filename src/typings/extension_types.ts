@@ -4,4 +4,12 @@ declare module "game/prototypes" {
         status: string | number;
         data: any;
     }
+
+    interface ConstructionSite {
+        tag: string | number;
+    }
+
+    interface Structure {
+        tag: string | number;
+    }
 }
