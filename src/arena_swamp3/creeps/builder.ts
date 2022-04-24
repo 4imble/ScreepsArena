@@ -1,5 +1,6 @@
 import State from "arena_swamp3/state";
 import { stat } from "fs";
+import { getRange } from "game";
 import { BodyPartConstant, CARRY, ERR_NOT_IN_RANGE, MOVE, RESOURCE_ENERGY, WORK } from "game/constants";
 import { ConstructionSite, Creep, StructureContainer, StructureExtension } from "game/prototypes";
 import { createConstructionSite, findClosestByPath, findClosestByRange, findInRange, getObjectsByPrototype } from "game/utils";
@@ -18,55 +19,64 @@ export default class Builder {
         return creep;
     }
 
+
     static work(builder: Creep) {
         let state = State.Instance;
 
         if (!builder.id)
             return;
 
-        let container = state.allContainers.sort((a, b) => (a.ticksToDecay ?? 0) - (b.ticksToDecay ?? 0)).reverse()[0];
+        console.log(builder.data.ext)
+
+        let bestContainers = state.allContainers
+            .filter(x => x.id.startsWith("a") && x.store.energy)
+            .map((cont: StructureContainer) => ({ container: cont, value: (cont.ticksToDecay ?? 0) - getRange(builder, cont) }))
+            .sort((a, b) => a.value - b.value).reverse()
+            .map(x => x.container);
+
+        if (!builder.data.container?.store?.energy) {
+            builder.data.container = bestContainers[0];
+            builder.data.ext = null;
+            builder.data.site = null;
+            builder.status = BuilderJobs.Collecting;
+        }
+
+        console.log("status", builder.status);
 
         switch (builder.status) {
             case BuilderJobs.Collecting:
-                let targetContainer = builder.data.container || container;
-                if (!targetContainer)
-                    break;
-                if (builder.getRangeTo(targetContainer) > 1)
-                    builder.moveTo(targetContainer, state.defaultMoveOptions);
-                else if (builder.store.getFreeCapacity()) {
-                    builder.withdraw(targetContainer, RESOURCE_ENERGY);
-                    builder.data.container = targetContainer;
+                if (builder.store.getFreeCapacity() != 0) {
+                    if (builder.withdraw(builder.data.container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                        builder.drop(RESOURCE_ENERGY);
+                        builder.moveTo(builder.data.container, state.defaultMoveOptions);
+                    }
                 }
                 else {
                     builder.status = BuilderJobs.Building;
-                    let existingConstruction = findInRange(builder.data.container, state.myConstructionSites, 1)[0];
-                    if (existingConstruction)
-                        builder.data.site = existingConstruction;
                 }
                 break;
             case BuilderJobs.Building:
-                let extensions = state.myExtensions.filter(x => x.store.getUsedCapacity(RESOURCE_ENERGY) == 0);
-                let extension = findInRange(builder.data.container, extensions, 2)[0];
-
-                if (builder.store.getUsedCapacity() == 0) {
+                if (getRange(builder, builder.data.container) > 1) {
+                    builder.drop(RESOURCE_ENERGY);
+                    builder.moveTo(builder.data.container, state.defaultMoveOptions);
+                }
+                else if (!builder.store.energy) {
                     builder.status = BuilderJobs.Collecting;
                 }
+                else if (builder.data.ext) {
+                    builder.transfer(builder.data.ext, RESOURCE_ENERGY);
+                }
+                else if (!builder.data.site) {
+                    let locations = ArrayTools.intersectRanges(RangeTools.getAvailableAdjacentSpaces(builder), RangeTools.getAvailableAdjacentSpaces(builder.data.container));
+                    builder.data.site = createConstructionSite(locations[0], StructureExtension).object;
+                }
                 else {
-                    if (!builder.data.site) {
-                        let locations = ArrayTools.intersectRanges(RangeTools.getAvailableAdjacentSpaces(builder), RangeTools.getAvailableAdjacentSpaces(builder.data.container));
-                        builder.data.site = createConstructionSite(locations[0], StructureExtension).object;
-                    }
-                    else {
-                        let constructionSite = <ConstructionSite>builder.data.site;
-                        builder.build(constructionSite);
-                        if (constructionSite.structure.id) {
-                            builder.data.site = null;
-                            builder.data.ext = constructionSite.structure;
-                            builder.status = BuilderJobs.Collecting;
-                        }
+                    let constructionSite = <ConstructionSite>builder.data.site;
+                    builder.build(constructionSite);
+                    if (constructionSite.structure.id) {
+                        builder.data.ext = constructionSite.structure;
                     }
                 }
-                break;
             default:
                 break;
         }
