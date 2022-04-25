@@ -11,7 +11,6 @@ export default class State {
         enemySpawn!: StructureSpawn;
         allContainers!: StructureContainer[];
         myExtensions!: StructureExtension[];
-        myConstructionSites!: ConstructionSite[];
         allCreeps: Creep[] = [];
         enemyCreeps: Creep[] = [];
         myCreeps: Creep[] = [];
@@ -27,7 +26,6 @@ export default class State {
             this.enemySpawn = <StructureSpawn>getObjectsByPrototype(StructureSpawn).find(i => !i.my);
             this.allContainers = getObjectsByPrototype(StructureContainer);
             this.myExtensions = getObjectsByPrototype(StructureExtension).filter(i => i.my);
-            this.myConstructionSites = getObjectsByPrototype(ConstructionSite).filter(i => i.my);
             this.allCreeps = getObjectsByPrototype(Creep);
             this.enemyCreeps = this.allCreeps.filter(i => !i.my);
             this.myCreeps = this.myCreeps.filter(x => x?.exists);
@@ -44,7 +42,7 @@ export default class State {
                 for (let x = enemy.x - avoidanceRange; x <= enemy.x + avoidanceRange; x++)
                     for (let y = enemy.y - avoidanceRange; y <= enemy.y + avoidanceRange; y++) {
                         let isWall = getTerrainAt({ x, y }) === TERRAIN_WALL;
-                        matrix.set(x, y, isWall ? 255 : 20);
+                        matrix.set(x, y, isWall ? 255 : matrix.get(x, y) + 10);
                     }
             });
 

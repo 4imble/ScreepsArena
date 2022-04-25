@@ -2,9 +2,9 @@ import State from "arena_swamp3/state";
 import { BodyPartConstant, CARRY, ERR_NOT_IN_RANGE, MOVE, RESOURCE_ENERGY } from "game/constants";
 import { Creep, StructureContainer, StructureExtension } from "game/prototypes";
 import { findClosestByPath, findClosestByRange, getObjectsByPrototype } from "game/utils";
-import { CreepType, MyCreep } from "./types";
+import { CreepType } from "./types";
 
-export default class Mule extends MyCreep {
+export default class Mule {
     static bodyTemplate: BodyPartConstant[] = [MOVE, CARRY, CARRY, MOVE, CARRY, MOVE];
 
     static convert(creep: Creep) {

@@ -2,9 +2,9 @@ import State from "arena_swamp3/state";
 import { ATTACK, BodyPartConstant, CARRY, ERR_NOT_IN_RANGE, MOVE, RESOURCE_ENERGY } from "game/constants";
 import { Creep, StructureContainer, StructureExtension } from "game/prototypes";
 import { findClosestByPath, findClosestByRange, findInRange, getObjectsByPrototype } from "game/utils";
-import { CreepType, MyCreep } from "./types";
+import { CreepType } from "./types";
 
-export default class Guardian extends MyCreep {
+export default class Guardian {
     static bodyTemplate: BodyPartConstant[] = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK];
 
     static convert(creep: Creep) {

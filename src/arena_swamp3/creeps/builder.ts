@@ -2,13 +2,13 @@ import State from "arena_swamp3/state";
 import { stat } from "fs";
 import { getRange } from "game";
 import { BodyPartConstant, CARRY, ERR_NOT_IN_RANGE, MOVE, RESOURCE_ENERGY, WORK } from "game/constants";
-import { ConstructionSite, Creep, StructureContainer, StructureExtension } from "game/prototypes";
+import { ConstructionSite, Creep, Id, StructureContainer, StructureExtension } from "game/prototypes";
 import { createConstructionSite, findClosestByPath, findClosestByRange, findInRange, getObjectsByPrototype } from "game/utils";
 import ArrayTools from "helpers/array-tools";
 import { RangeTools } from "helpers/range-tools";
-import { CreepType, MyCreep } from "./types";
+import { CreepType } from "./types";
 
-export default class Builder extends MyCreep {
+export default class Builder {
     static bodyTemplate: BodyPartConstant[] = [MOVE, MOVE, MOVE, MOVE, MOVE, WORK, CARRY];
 
     static convert(creep: Creep) {
@@ -26,8 +26,14 @@ export default class Builder extends MyCreep {
         if (!builder.id)
             return;
 
+        let currentAllocations: Id<StructureContainer>[] = state.getMyCreeps(CreepType.Builder).map(x => x.data.container?.id).filter(x => x);
+
+        console.log("allocations", currentAllocations)
+
         let bestContainers = state.allContainers
-            .filter(x => x.id.startsWith("a") && x.store.energy)
+            .filter(x => x.id.startsWith("a"))
+            .filter(x => x.store.energy)
+            .filter(x => !currentAllocations.some(c => c == x.id))
             .map((cont: StructureContainer) => ({ container: cont, value: (cont.ticksToDecay ?? 0) - getRange(builder, cont) }))
             .sort((a, b) => a.value - b.value).reverse()
             .map(x => x.container);
