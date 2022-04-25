@@ -6,9 +6,9 @@ import { ConstructionSite, Creep, StructureContainer, StructureExtension } from 
 import { createConstructionSite, findClosestByPath, findClosestByRange, findInRange, getObjectsByPrototype } from "game/utils";
 import ArrayTools from "helpers/array-tools";
 import { RangeTools } from "helpers/range-tools";
-import { CreepType } from "./types";
+import { CreepType, MyCreep } from "./types";
 
-export default class Builder {
+export default class Builder extends MyCreep {
     static bodyTemplate: BodyPartConstant[] = [MOVE, MOVE, MOVE, MOVE, MOVE, WORK, CARRY];
 
     static convert(creep: Creep) {
@@ -26,8 +26,6 @@ export default class Builder {
         if (!builder.id)
             return;
 
-        console.log(builder.data.ext)
-
         let bestContainers = state.allContainers
             .filter(x => x.id.startsWith("a") && x.store.energy)
             .map((cont: StructureContainer) => ({ container: cont, value: (cont.ticksToDecay ?? 0) - getRange(builder, cont) }))
@@ -40,8 +38,6 @@ export default class Builder {
             builder.data.site = null;
             builder.status = BuilderJobs.Collecting;
         }
-
-        console.log("status", builder.status);
 
         switch (builder.status) {
             case BuilderJobs.Collecting:

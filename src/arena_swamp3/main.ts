@@ -10,9 +10,10 @@ import { ConstructionSite, Creep, RoomPosition, Structure, StructureContainer, S
 import { createConstructionSite, findPath, getDistance, getObjectsByPrototype, getTerrainAt, getTicks } from "game/utils";
 import ArrayTools from "helpers/array-tools";
 import { RangeTools } from "helpers/range-tools";
+import { SpawnTools } from "helpers/spawn-tools";
 import Builder from "./creeps/builder";
 import Mule from "./creeps/mule";
-import { CreepType } from "./creeps/types";
+import { CreepType, MyCreep } from "./creeps/types";
 import State from "./state";
 
 enum AttackStatus {
@@ -22,42 +23,13 @@ enum AttackStatus {
 }
 
 let state: State = State.Instance;
+let spawnTools: SpawnTools = new SpawnTools(state.mySpawn);
 
 export function loop(): void {
     state.calculate();
-
-    if (state.mySpawn) {
-        spawning();
-        giveorders();
-    }
+    spawnTools.spawn();
+    giveorders();
 }
-
-function spawning() {
-    createMule() || createBuilder();
-}
-
-function createMule() {
-    let creeps = state.getMyCreeps(CreepType.Mule);
-    if (creeps.length)
-        return false;
-
-    let creep = <Creep>state.mySpawn.spawnCreep(Mule.bodyTemplate).object;
-    if(creep)
-        state.myCreeps.push(Mule.convert(creep));
-    return true;
-}
-
-function createBuilder() {
-    let creeps = state.getMyCreeps(CreepType.Builder);
-    if (creeps.length)
-        return false;
-
-    let creep = <Creep>state.mySpawn.spawnCreep(Builder.bodyTemplate).object;
-    if(creep)
-        state.myCreeps.push(Builder.convert(creep));
-    return true;
-}
-
 
 function giveorders() {
     state.myCreeps.forEach(myCreep => {
