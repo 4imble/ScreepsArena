@@ -1,7 +1,7 @@
 import State from "arena_swamp3/state";
-import { ATTACK, BodyPartConstant, CARRY, ERR_NOT_IN_RANGE, MOVE, RESOURCE_ENERGY } from "game/constants";
-import { Creep, StructureContainer, StructureExtension } from "game/prototypes";
-import { findClosestByPath, findClosestByRange, findInRange, getObjectsByPrototype } from "game/utils";
+import { ATTACK, BodyPartConstant, ERR_NOT_IN_RANGE, MOVE } from "game/constants";
+import { Creep } from "game/prototypes";
+import { findClosestByPath, findInRange } from "game/utils";
 import { CreepType } from "./types";
 
 export default class Guardian {

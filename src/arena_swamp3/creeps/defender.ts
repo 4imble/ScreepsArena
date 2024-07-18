@@ -1,8 +1,7 @@
 import State from "arena_swamp3/state";
-import { getRange } from "game";
 import { BodyPartConstant, CARRY, ERR_NOT_IN_RANGE, MOVE, RESOURCE_ENERGY, WORK } from "game/constants";
 import { ConstructionSite, Creep, StructureRampart } from "game/prototypes";
-import { createConstructionSite, findClosestByPath } from "game/utils";
+import { createConstructionSite, findClosestByPath, getRange } from "game/utils";
 import Builder from "./builder";
 import { CreepType } from "./types";
 
@@ -51,7 +50,7 @@ export default class Defender {
                 else {
                     let constructionSite = <ConstructionSite>defender.data.site;
                     defender.build(constructionSite);
-                    if (constructionSite.structure.id) {
+                    if (constructionSite.structure?.id) {
                         Builder.convert(defender);
                     }
                 }

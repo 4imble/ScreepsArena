@@ -1,10 +1,7 @@
-import { spawn } from "child_process";
-import { create } from "domain";
-import { findClosestByPath, findClosestByRange, findInRange, getRange } from "game";
-import { ATTACK, CARRY, ERR_NOT_IN_RANGE, HEAL, MOVE, OK, RANGED_ATTACK, RESOURCE_ENERGY, TERRAIN_WALL, TOUGH, WORK } from "game/constants";
-import { CostMatrix, MoveToOpts, searchPath } from "game/path-finder";
-import { ConstructionSite, Creep, RoomPosition, Structure, StructureContainer, StructureRampart, StructureSpawn } from "game/prototypes";
-import { createConstructionSite, findPath, getDistance, getObjectsByPrototype, getTerrainAt, getTicks } from "game/utils";
+import { ATTACK, CARRY, ERR_NOT_IN_RANGE, HEAL, MOVE, RANGED_ATTACK, RESOURCE_ENERGY, TERRAIN_WALL, WORK } from "game/constants";
+import { CostMatrix, MoveToOpts} from "game/path-finder";
+import { ConstructionSite, Creep, Structure, StructureContainer, StructureRampart, StructureSpawn } from "game/prototypes";
+import { findClosestByRange, findInRange, getRange, createConstructionSite, getObjectsByPrototype, getTerrainAt } from "game/utils";
 
 enum AttackStatus {
     Idle,
@@ -174,7 +171,7 @@ function orderBaiters() {
     if (getRange(baiter, centerCorners[baiter.data.corner]) < range + 1)
         baiter.data.corner = baiter.data.corner < 4 ? baiter.data.corner + 1 : 1;
 
-    baiter.moveTo(centerCorners[baiter.data.corner], { ...defaultMoveOptions, range: range });
+    baiter.moveTo(centerCorners[baiter.data.corner], { ...defaultMoveOptions });
     baiter.rangedAttack(findClosestByRange(baiter, enemyCreeps));
 }
 

@@ -1,8 +1,6 @@
-import { spawn } from "child_process";
-import { findClosestByPath, findClosestByRange, findInRange, getRange } from "game";
-import { ATTACK, CARRY, ERR_NOT_IN_RANGE, HEAL, MOVE, OK, RANGED_ATTACK, RESOURCE_ENERGY, TOUGH } from "game/constants";
-import { Creep, RoomPosition, Structure, StructureContainer, StructureSpawn } from "game/prototypes";
-import { getObjectsByPrototype, getTicks } from "game/utils";
+import { findClosestByRange, findInRange, getRange, getObjectsByPrototype, getTicks } from "game/utils";
+import { ATTACK, CARRY, ERR_NOT_IN_RANGE, HEAL, MOVE, RANGED_ATTACK, RESOURCE_ENERGY, TOUGH } from "game/constants";
+import { Creep, Structure, StructureContainer, StructureSpawn } from "game/prototypes";
 
 enum AttackStatus {
   Idle,

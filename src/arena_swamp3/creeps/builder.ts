@@ -1,9 +1,7 @@
 import State from "arena_swamp3/state";
-import { stat } from "fs";
-import { getRange } from "game";
 import { BodyPartConstant, CARRY, ERR_NOT_IN_RANGE, MOVE, RESOURCE_ENERGY, WORK } from "game/constants";
 import { ConstructionSite, Creep, Id, StructureContainer, StructureExtension } from "game/prototypes";
-import { createConstructionSite, findClosestByPath, findClosestByRange, findInRange, getObjectsByPrototype } from "game/utils";
+import { createConstructionSite, getRange } from "game/utils";
 import ArrayTools from "helpers/array-tools";
 import { RangeTools } from "helpers/range-tools";
 import { CreepType } from "./types";
@@ -75,7 +73,7 @@ export default class Builder {
                 else {
                     let constructionSite = <ConstructionSite>builder.data.site;
                     builder.build(constructionSite);
-                    if (constructionSite.structure.id) {
+                    if (constructionSite.structure?.id) {
                         builder.data.ext = constructionSite.structure;
                     }
                 }
