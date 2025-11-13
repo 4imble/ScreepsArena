@@ -1,43 +1,28 @@
-declare module "game/prototypes" {
-  import { BuildableStructure } from "game/constants";
 
-  /**
-   * A site of a structure which is currently under construction
-   */
-  export interface ConstructionSite<
-    T extends BuildableStructure = BuildableStructure
-  > extends GameObject {
-    readonly prototype: ConstructionSite<T>;
-    /**
-     * The current construction progress.
-     */
-    progress: number;
-    /**
-     * The total construction progress needed for the structure to be built.
-     */
-    progressTotal: number;
-    /**
-     * One of the STRUCTURE_PROTOTYPES entries
-     */
-    structurePrototypeName: string;
-    /**
-     * The structure that was built (when the construction site is completed)
-     * You can check what structure is being constructed using the instanceof operator:
-     */
-    structure: T;
-    /**
-     * Whether it is your construction site.
-     */
-    my: boolean;
-    /**
-     * Remove this construction site
-     */
-    remove(): void;
-  }
+declare module "game/prototypes/construction-site" {
 
-  interface ConstructionSiteConstructor
-    extends _Constructor<ConstructionSite>,
-      _ConstructorById<ConstructionSite> {}
+import { GameObject } from 'game/prototypes';
+import { Structure } from 'game/prototypes/structure';
 
-  export const ConstructionSite: ConstructionSiteConstructor;
+        /**
+     * A site of a structure which is currently under construction
+     */
+    export class ConstructionSite extends GameObject {
+        /** The current construction progress */
+        readonly progress?: number;
+
+        /** The total construction progress needed for the structure to be built */
+        readonly progressTotal?: number;
+
+        /** The structure that will be built (when the construction site is completed) */
+        readonly structure?: Structure;
+
+        /** Whether it is your construction site */
+        readonly my?: boolean;
+
+        /**
+         * Remove this construction site
+         */
+        remove(): void;
+    }
 }

@@ -1,16 +1,17 @@
-/// <reference path="construction-site.d.ts" />
-/// <reference path="creep.d.ts" />
-/// <reference path="game-object.d.ts" />
-/// <reference path="owned-structure.d.ts" />
-/// <reference path="prototypes.d.ts" />
-/// <reference path="resource.d.ts" />
-/// <reference path="source.d.ts" />
-/// <reference path="store.d.ts" />
-/// <reference path="structure-container.d.ts" />
-/// <reference path="structure-extension.d.ts" />
-/// <reference path="structure-rampart.d.ts" />
-/// <reference path="structure-road.d.ts" />
-/// <reference path="structure-spawn.d.ts" />
-/// <reference path="structure-tower.d.ts" />
-/// <reference path="structure-wall.d.ts" />
-/// <reference path="structure.d.ts" />
+declare module "game/prototypes" {
+    export {Creep} from "game/prototypes/creep";
+    export {GameObject} from "game/prototypes/game-object";
+    export {Structure} from "game/prototypes/structure";
+    export {OwnedStructure} from "game/prototypes/owned-structure";
+    export {StructureTower} from "game/prototypes/tower";
+    export {StructureSpawn} from "game/prototypes/spawn";
+    export {StructureWall} from "game/prototypes/wall";
+    export {StructureContainer} from "game/prototypes/container";
+    export {Source} from "game/prototypes/source";
+    export {Resource} from "game/prototypes/resource";
+    export {StructureRampart} from "game/prototypes/rampart";
+    export {ConstructionSite} from "game/prototypes/construction-site";
+    export {StructureExtension} from "game/prototypes/extension";
+    export {StructureRoad} from "game/prototypes/road";
+    export {Flag} from "game/prototypes/flag";
+}

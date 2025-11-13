@@ -1,0 +1,2 @@
+typings can be found per gametype here
+%userprofile%\ScreepsArena\

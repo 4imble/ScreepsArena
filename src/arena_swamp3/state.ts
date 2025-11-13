@@ -1,9 +1,9 @@
 import { ATTACK, RANGED_ATTACK, TERRAIN_WALL } from 'game/constants';
-import { CostMatrix, FindPathOptions } from 'game/path-finder';
+import { CostMatrix } from 'game/path-finder';
 import {
     ConstructionSite, Creep, StructureContainer, StructureExtension, StructureSpawn
 } from 'game/prototypes';
-import { getObjectsByPrototype, getTerrainAt } from 'game/utils';
+import { FindPathOptions, getObjectsByPrototype, getTerrainAt } from 'game/utils';
 
 import { CreepType } from './creeps/types';
 

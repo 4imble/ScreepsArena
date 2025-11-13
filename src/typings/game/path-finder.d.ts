@@ -1,94 +1,94 @@
 declare module "game/path-finder" {
-  import { GameObject, Position, _Constructor } from "game/prototypes";
+import { Position } from 'game/prototypes';
 
-  export type Goal = Position | { pos: Position; range: number };
+        export type SearchPathOptions = {
+        /** Custom navigation cost data */
+        costMatrix?: CostMatrix;
 
-  export function searchPath(
-    origin: Position,
-    goal: Goal | Goal[],
-    options?: SearchPathOptions
-  ): SearchPathResult;
+        /** Cost for walking on plain positions. The default is 2 */
+        plainCost?: number;
 
-  export interface CostMatrix {
-    _bits: Uint8Array;
+        /** Cost for walking on swamp positions. The default is 10 */
+        swampCost?: number;
 
-    /**
-     * Set the cost of a position in this CostMatrix.
-     * @param x X position in the room.
-     * @param y Y position in the room.
-     * @param cost Cost of this position. Must be a whole number. A cost of 0 will use the terrain cost for that tile. A cost greater than or equal to 255 will be treated as unwalkable.
-     */
-    set(x: number, y: number, cost: number): void;
+        /**
+         * Instead of searching for a path to the goals this will search for a path away from the goals.
+         * The cheapest path that is out of range of every goal will be returned.
+         * The default is false
+         */
+        flee?: boolean;
 
-    /**
-     * Get the cost of a position in this CostMatrix.
-     * @param x X position in the room.
-     * @param y Y position in the room.
-     */
-    get(x: number, y: number): number;
+        /** The maximum allowed pathfinding operations. The default value is 50000 */
+        maxOps?: number;
 
-    /**
-     * Copy this CostMatrix into a new CostMatrix with the same data.
-     */
-    clone(): CostMatrix;
-  }
+        /** The maximum allowed cost of the path returned. The default is Infinity */
+        maxCost?: number;
 
-  interface CostMatrixConstructor
-    extends _Constructor<CostMatrix>,
-      CostMatrix {}
+        /** Weight from 1 to 9 to apply to the heuristic in the A* formula F = G + weight * H. The default value is 1.2 */
+        heuristicWeight?: number;
+    }
 
-  export const CostMatrix: CostMatrixConstructor;
+    export type SearchPathResult = {
+        /** The path found as an array of objects containing x and y properties */
+        path: Position[];
 
-  export interface SearchPathResult {
-    /** The path found as an array of objects containing x and y properties */
-    path: Position[];
+        /** Total number of operations performed before this path was calculated */
+        ops: number;
 
-    /** Total number of operations performed before this path was calculated */
-    ops: number;
+        /** The total cost of the path as derived from plainCost, swampCost, and given CostMatrix instance */
+        cost: number;
 
-    /** The total cost of the path as derived from plainCost, swampCost, and given CostMatrix instance */
-    cost: number;
-
-    /** If the pathfinder fails to find a complete path, this will be true */
-    incomplete: boolean;
-  }
-
-  export interface SearchPathOptions {
-    /** Custom navigation cost data */
-    costMatrix?: CostMatrix;
-
-    /** Cost for walking on plain positions. The default is 2 */
-    plainCost?: number;
-
-    /** Cost for walking on swamp positions. The default is 10 */
-    swampCost?: number;
+        /** If the pathfinder fails to find a complete path, this will be true */
+        incomplete: boolean;
+    }
 
     /**
-     * Instead of searching for a path to the goals this will search for a path away from the goals.
-     * The cheapest path that is out of range of every goal will be returned.
-     * The default is false
+     * Container for custom navigation cost data.
+     * If a non-0 value is found in the CostMatrix then that value will be used instead of the default terrain cost.
      */
-    flee?: boolean;
+    export class CostMatrix {
+        /**
+         * Creates a new {@link CostMatrix} containing 0's for all positions.
+         */
+        constructor();
 
-    /** The maximum allowed pathfinding operations. The default value is 50000 */
-    maxOps?: number;
+        /**
+         * Get the cost of a position in this {@link CostMatrix}.
+         * @param x The X position in the game
+         * @param y The Y position in the game
+         * @returns the cost at the specified position
+         */
+        get(x: number, y: number): number;
 
-    /** The maximum allowed cost of the path returned. The default is Infinity */
-    maxCost?: number;
+        /**
+         * Set the cost of a position in this {@link CostMatrix}.
+         * @param x The X position in the game
+         * @param y The Y position in the game
+         * @param cost Cost of this position.
+         */
+        set(x: number, y: number, cost: number): void;
 
-    /** Weight from 1 to 9 to apply to the heuristic in the A* formula F = G + weight * H. The default value is 1.2 */
-    heuristicWeight?: number;
+        /**
+         * @returns a new {@link CostMatrix} instance.
+         */
+        clone(): CostMatrix;
+    }
+
+    export type Goal = Position | {pos: Position, range: number};
 
     /**
-     * An array of the room's objects or Position objects which should be treated as obstacles during the search
+     * Find an optimal path between origin and goal.
+     * @param origin The start position.
+     * @param goal A goal or an array of goals
+     * @param options An object containing additional pathfinding flags
+     * @param options.costMatrix Custom navigation cost data
+     * @param options.plainCost Cost for walking on plain positions. The default is 2
+     * @param options.swampCost Cost for walking on swamp positions. The default is 10
+     * @param options.flee Instead of searching for a path to the goals this will search for a path away from the goals. The default is false
+     * @param options.maxOps The maximum allowed pathfinding operations. The default value is 50000
+     * @param options.maxCost The maximum allowed cost of the path returned. The default is Infinity
+     * @param options.heuristicWeight Weight from 1 to 9 to apply to the heuristic in the A* formula F = G + weight * H. The default value is 1.2
+     * @returns a {@link SearchPathResult} object with the search result
      */
-    ignore?: Position[];
-  }
-
-  export interface FindPathOptions extends SearchPathOptions {
-    /**
-     * An array of the room's objects which should be treated as obstacles during the search
-     */
-    ignore?: GameObject[];
-  }
+    export function searchPath(origin: Position, goal: Goal | Goal[], options?: SearchPathOptions): SearchPathResult;
 }
