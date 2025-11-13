@@ -1,8 +1,11 @@
-import { ATTACK, RANGED_ATTACK, TERRAIN_WALL } from "game/constants";
-import { CostMatrix, MoveToOpts } from "game/path-finder";
-import { ConstructionSite, Creep, StructureContainer, StructureExtension, StructureSpawn } from "game/prototypes";
-import { getObjectsByPrototype, getTerrainAt } from "game/utils";
-import { CreepType } from "./creeps/types";
+import { ATTACK, RANGED_ATTACK, TERRAIN_WALL } from 'game/constants';
+import { CostMatrix, FindPathOptions } from 'game/path-finder';
+import {
+    ConstructionSite, Creep, StructureContainer, StructureExtension, StructureSpawn
+} from 'game/prototypes';
+import { getObjectsByPrototype, getTerrainAt } from 'game/utils';
+
+import { CreepType } from './creeps/types';
 
 export default class State {
         private static _instance: State;
@@ -15,7 +18,7 @@ export default class State {
         enemyCreeps: Creep[] = [];
         myCreeps: Creep[] = [];
         avoidanceMatrix!: CostMatrix;
-        defaultMoveOptions!: MoveToOpts;
+        defaultMoveOptions!: FindPathOptions;
 
         constructor(){
             this.calculate();

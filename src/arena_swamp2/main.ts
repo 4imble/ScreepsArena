@@ -1,7 +1,14 @@
-import { ATTACK, CARRY, ERR_NOT_IN_RANGE, HEAL, MOVE, RANGED_ATTACK, RESOURCE_ENERGY, TERRAIN_WALL, WORK } from "game/constants";
-import { CostMatrix, MoveToOpts} from "game/path-finder";
-import { ConstructionSite, Creep, Structure, StructureContainer, StructureRampart, StructureSpawn } from "game/prototypes";
-import { findClosestByRange, findInRange, getRange, createConstructionSite, getObjectsByPrototype, getTerrainAt } from "game/utils";
+import {
+    ATTACK, CARRY, ERR_NOT_IN_RANGE, HEAL, MOVE, RANGED_ATTACK, RESOURCE_ENERGY, TERRAIN_WALL, WORK
+} from 'game/constants';
+import { CostMatrix, FindPathOptions } from 'game/path-finder';
+import {
+    ConstructionSite, Creep, Structure, StructureContainer, StructureRampart, StructureSpawn
+} from 'game/prototypes';
+import {
+    createConstructionSite, findClosestByRange, findInRange, getObjectsByPrototype, getRange,
+    getTerrainAt
+} from 'game/utils';
 
 enum AttackStatus {
     Idle,
@@ -31,7 +38,7 @@ let enemyCreeps: Creep[] = [];
 let myCreeps: Creep[] = [];
 
 let avoidanceMatrix: CostMatrix;
-let defaultMoveOptions: MoveToOpts;
+let defaultMoveOptions: FindPathOptions;
 
 let rampsComplete: boolean = false;
 

@@ -2,10 +2,12 @@
   "compilerOptions": {
     "module": "esnext",
     "lib": [
-      "esnext"
+      "esnext",
+      "dom"
     ],
     "target": "es2018",
     "moduleResolution": "Node",
+    "ignoreDeprecations": "5.0",
     "outDir": "dist",
     "baseUrl": "src/",
     "sourceMap": true,

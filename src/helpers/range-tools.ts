@@ -1,9 +1,9 @@
-import { TERRAIN_WALL } from "game/constants";
-import { RoomPosition } from "game/prototypes";
-import { getTerrainAt } from "game/utils";
+import { TERRAIN_WALL } from 'game/constants';
+import { Position } from 'game/prototypes';
+import { getTerrainAt } from 'game/utils';
 
 export class RangeTools {
-    static getAvailableAdjacentSpaces(target: RoomPosition, range: number = 1) {
+    static getAvailableAdjacentSpaces(target: Position, range: number = 1) {
         let validSpaces = [];
         for (let x = target.x - range; x <= target.x + range; x++)
             for (let y = target.y - range; y <= target.y + range; y++) {
@@ -15,7 +15,7 @@ export class RangeTools {
         return validSpaces;
     }
 
-    static match(source: RoomPosition, target: RoomPosition) {
+    static match(source: Position, target: Position) {
         return source.x == target.x && source.y == target.y;
     }
 }
